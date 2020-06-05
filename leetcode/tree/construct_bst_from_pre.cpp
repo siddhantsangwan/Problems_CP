@@ -1,0 +1,109 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+class TreeNode {
+public:
+    int val;
+    TreeNode *left;
+    TreeNode *right;
+
+    TreeNode(int x) {
+        val = x;
+    }
+};
+ 
+class Solution {
+    void preorder(TreeNode &root, vector<int> &v, int &level, int &height, int &i, int &len)
+    {
+        if (i == len - 1)
+            return;
+        root.val = v[i++]; 
+        level++;
+        if (level == height)
+        {
+            level--;
+            return;
+        }
+        
+        (root.left) = new TreeNode(0);
+        preorder(*(root.left), v, level, height, i, len);
+        (root.right) = new TreeNode(0);
+        preorder(*(root.right), v, level, height, i, len);
+    }
+    
+public:
+    TreeNode* bstFromPreorder(vector<int>& v) {
+        int len = v.size();
+        int height = log(len) / log(2);
+        int level = 0, i = 0;
+        TreeNode root(0);
+        
+        preorder(root, v, level, height, i, len);
+        TreeNode* ans = &root;
+        return ans;
+    }
+};
+
+void trimLeftTrailingSpaces(string &input) {
+    input.erase(input.begin(), find_if(input.begin(), input.end(), [](int ch) {
+        return !isspace(ch);
+    }));
+}
+
+void trimRightTrailingSpaces(string &input) {
+    input.erase(find_if(input.rbegin(), input.rend(), [](int ch) {
+        return !isspace(ch);
+    }).base(), input.end());
+}
+
+vector<int> stringToIntegerVector(string input) {
+    vector<int> output;
+    trimLeftTrailingSpaces(input);
+    trimRightTrailingSpaces(input);
+    input = input.substr(1, input.length() - 2);
+    stringstream ss;
+    ss.str(input);
+    string item;
+    char delim = ',';
+    while (getline(ss, item, delim)) {
+        output.push_back(stoi(item));
+    }
+    return output;
+}
+
+string treeNodeToString(TreeNode* root) {
+    if (root == nullptr) {
+      return "[]";
+    }
+
+    string output = "";
+    queue<TreeNode*> q;
+    q.push(root);
+    while(!q.empty()) {
+        TreeNode* node = q.front();
+        q.pop();
+
+        if (node == nullptr) {
+          output += "null, ";
+          continue;
+        }
+
+        output += to_string(node->val) + ", ";
+        q.push(node->left);
+        q.push(node->right);
+    }
+    return "[" + output.substr(0, output.length() - 2) + "]";
+}
+
+int main() {
+    string line;
+    while (getline(cin, line)) {
+        vector<int> preorder = stringToIntegerVector(line);
+        
+        TreeNode* ret = Solution().bstFromPreorder(preorder);
+
+        string out = treeNodeToString(ret);
+        cout << out << endl;
+    }
+    return 0;
+}
